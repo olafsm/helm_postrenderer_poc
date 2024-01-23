@@ -1,0 +1,43 @@
+---
+# Source: test-postrenderertest/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-test-postrenderertest
+  labels:
+    helm.sh/chart: test-postrenderertest-0.1.0
+    app.kubernetes.io/name: test-postrenderertest
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: test-postrenderertest
+    app.kubernetes.io/instance: release-name
+---
+# Source: <ENV>-postrenderertest/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-<ENV>-postrenderertest-test-connection"
+  labels:
+    helm.sh/chart: <ENV>-postrenderertest-0.1.0
+    app.kubernetes.io/name: <ENV>-postrenderertest
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['release-name-<ENV>-postrenderertest:80']
+  restartPolicy: Never
